@@ -6,9 +6,10 @@ import java.util.Arrays;
 
 public class IntegerListImpl implements IntegerList {
 
+    private static int lengthOfArray = 100000;
     public static Integer[] generateRandomArray() {
         java.util.Random random = new java.util.Random();
-        Integer[] arr = new Integer[100000];
+        Integer[] arr = new Integer[lengthOfArray];
         for (Integer i = 0; i < arr.length; i++) {
             arr[i] = random.nextInt(100_000) + 100_000;
         }
@@ -24,7 +25,13 @@ public class IntegerListImpl implements IntegerList {
         countIntegers = Integers.length;
     }
 
-
+    private void grow () {
+        int newLength = lengthOfArray * 3/2 + 1;
+        Integer[] newExpandedArrayOfIntegers = new Integer[newLength];
+        System.arraycopy(arrayOfIntegers, 0, newExpandedArrayOfIntegers, 0, lengthOfArray);
+        arrayOfIntegers = newExpandedArrayOfIntegers;
+        lengthOfArray = newLength;
+    }
 
     @Override
     public Integer add (Integer certainInteger) {
@@ -33,9 +40,7 @@ public class IntegerListImpl implements IntegerList {
         }
 
         if (arrayOfIntegers.length == countIntegers) {
-            Integer[] newArrayOfIntegers = new Integer[countIntegers + 1];
-            System.arraycopy(arrayOfIntegers, 0, newArrayOfIntegers, 0, arrayOfIntegers.length);
-            arrayOfIntegers = newArrayOfIntegers;
+            grow();
         }
         arrayOfIntegers[countIntegers] = certainInteger;
         countIntegers++;
@@ -53,9 +58,9 @@ public class IntegerListImpl implements IntegerList {
             throw new NullPointerException("Значение элемента массива не может быть пустым");
         }
 
-        Integer[] newArrayOfIntegers;
+        Integer[] newArrayOfIntegers = new Integer[0];
         if (arrayOfIntegers.length == countIntegers) {
-            newArrayOfIntegers = new Integer[arrayOfIntegers.length + 1];
+            grow();
         } else {
             newArrayOfIntegers = new Integer[arrayOfIntegers.length];
         }
@@ -211,6 +216,31 @@ public class IntegerListImpl implements IntegerList {
         }
     }
 
+    public static void quickSort(Integer[] arr, int begin, int end) {
+        if (begin < end) {
+            int partitionIndex = partition(arr, begin, end);
+
+            quickSort(arr, begin, partitionIndex - 1);
+            quickSort(arr, partitionIndex + 1, end);
+        }
+    }
+
+    private static int partition(Integer[] arr, int begin, int end) {
+        int pivot = arr[end];
+        int i = (begin - 1);
+
+        for (int j = begin; j < end; j++) {
+            if (arr[j] <= pivot) {
+                i++;
+
+                swapElements(arr, i, j);
+            }
+        }
+
+        swapElements(arr, i + 1, end);
+        return i + 1;
+    }
+
 
     public static void swapElements(Integer[] arr, int indexA, int indexB) {
         int tmp = arr[indexA];
@@ -219,7 +249,7 @@ public class IntegerListImpl implements IntegerList {
     }
 
 
-    private static void sortSelection(Integer[] arr) {
+    public static void sortSelection(Integer[] arr) {
         for (int i = 0; i < arr.length - 1; i++) {
             int minElementIndex = i;
             for (int j = i + 1; j < arr.length; j++) {
